@@ -1,12 +1,35 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState, useMemo } from 'react';
+import { Header } from '@/components/Header';
+import { HeroSection } from '@/components/HeroSection';
+import { ProductGrid } from '@/components/ProductGrid';
+import { Footer } from '@/components/Footer';
+import { products } from '@/data/products';
 
 const Index = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+
+  const filteredProducts = useMemo(() => {
+    return products.filter((product) => {
+      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          product.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [searchQuery, selectedCategory]);
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <Header 
+        onSearch={setSearchQuery}
+        onCategoryFilter={setSelectedCategory}
+      />
+      <HeroSection />
+      <ProductGrid 
+        products={filteredProducts}
+        title={selectedCategory === 'All' ? 'Featured Products' : `${selectedCategory} Products`}
+      />
+      <Footer />
     </div>
   );
 };
